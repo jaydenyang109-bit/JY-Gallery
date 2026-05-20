@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JY's Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg: #f9f8f6; --surface: #ffffff; --border: #e8e5e0; --text: #0f0f0f; --muted: #9a9590; --tag-bg: #f0ede8; --tag-text: #6b6560; --radius: 12px; --font-display: 'Syne', sans-serif; --font-body: 'Inter', sans-serif; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 14px; line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+nav { position: sticky; top: 0; z-index: 50; background: rgba(249,248,246,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2.5rem; height: 58px; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { font-family: var(--font-display); font-size: 17px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); text-decoration: none; }
+.nav-right { display: flex; align-items: center; gap: 1.5rem; }
+.nav-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.nav-status { font-size: 12px; color: var(--muted); }
+.hero { max-width: 1080px; margin: 0 auto; padding: 2.5rem 2.5rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+.hero-left h1 { font-family: var(--font-display); font-size: 32px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; color: var(--text); }
+.hero-left h1 span { color: var(--muted); }
+.hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.hero-stat { font-family: var(--font-display); font-size: 32px; font-weight: 700; letter-spacing: -1px; color: var(--text); line-height: 1; }
+.hero-stat-label { font-size: 12px; color: var(--muted); text-align: right; }
+.divider { max-width: 1080px; margin: 0 auto; padding: 0 2.5rem; border: none; border-top: 1px solid var(--border); }
+.tab-row { max-width: 1080px; margin: 0 auto; padding: 0 2.5rem; display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+.tab { font-family: var(--font-display); font-size: 15px; font-weight: 600; padding: 1.1rem 1.75rem 1rem; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; display: flex; align-items: center; gap: 8px; background: none; border-top: none; border-left: none; border-right: none; letter-spacing: -0.2px; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-count { font-family: var(--font-body); font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 999px; background: var(--tag-bg); color: var(--tag-text); transition: background 0.15s, color 0.15s; }
+.tab.active .tab-count { background: var(--text); color: var(--bg); }
+#gallery { max-width: 1080px; margin: 1.5rem auto 0; padding: 0 2.5rem 5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s; }
+.card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+.card-img-wrap { aspect-ratio: 1; overflow: hidden; background: var(--tag-bg); }
+.card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+.card:hover img { transform: scale(1.04); }
+.card-body { padding: 12px 14px 14px; border-top: 1px solid var(--border); }
+.card-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tag-pill { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 999px; background: var(--tag-bg); color: var(--tag-text); }
+.empty { grid-column: 1 / -1; text-align: center; padding: 5rem 0; color: var(--muted); }
+.empty-icon { width: 56px; height: 56px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.empty p { font-size: 13px; }
+#lightbox { display: none; position: fixed; inset: 0; background: rgba(15,15,15,0.75); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 2rem; }
+#lightbox.open { display: flex; }
+.lb-card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); width: min(900px, 100%); overflow: hidden; position: relative; }
+.lb-img-wrap { background: var(--tag-bg); }
+#lb-img { width: 100%; max-height: 70vh; object-fit: contain; display: block; }
+.lb-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; }
+#lb-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); margin-bottom: 2px; }
+#lb-tag { font-size: 12px; color: var(--muted); }
+.lb-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; background: rgba(255,255,255,0.9); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); transition: all 0.15s; font-size: 16px; }
+.lb-close:hover { color: var(--text); }
+@media (max-width: 600px) { nav, .hero, .tab-row, #gallery { padding-left: 1.25rem; padding-right: 1.25rem; } .hero { padding-top: 2rem; } #gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; } .tab { padding: 1rem 1rem; font-size: 13px; } }
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="#">JY's Gallery</a>
+  <div class="nav-right">
+    <div class="nav-dot"></div>
+    <span class="nav-status">Sacramento, CA</span>
+  </div>
+</nav>
+<section class="hero">
+  <div class="hero-left"><h1>Work <span>Samples</span></h1></div>
+  <div class="hero-right">
+    <div class="hero-stat" id="hero-count">0</div>
+    <div class="hero-stat-label">photos</div>
+  </div>
+</section>
+<hr class="divider">
+<div class="tab-row">
+  <button class="tab active" data-tag="all">All <span class="tab-count" id="tc-all">0</span></button>
+  <button class="tab" data-tag="sneakers">Sneakers <span class="tab-count" id="tc-sneakers">0</span></button>
+  <button class="tab" data-tag="detailing">Detailing <span class="tab-count" id="tc-detailing">0</span></button>
+</div>
+<div id="gallery"></div>
+<div id="lightbox" role="dialog" aria-modal="true">
+  <div class="lb-card">
+    <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
+    <div class="lb-img-wrap"><img id="lb-img" src="" alt=""></div>
+    <div class="lb-footer"><div><div id="lb-title"></div><div id="lb-tag"></div></div></div>
+  </div>
+</div>
+<script>
+const photos = [
+  { src: "sales1.png", name: "SneakerConsign Sales", tag: "sneakers" },
+  { src: "sales2.png", name: "513HEATZ Sales", tag: "sneakers" },
+  { src: "det1.jpg", name: "Cadillac Escalade — Front Detail", tag: "detailing" },
+  { src: "det2.jpg", name: "Cadillac Escalade — Side Detail", tag: "detailing" },
+  { src: "det3.jpg", name: "Porsche 911 — Front Detail", tag: "detailing" },
+  { src: "det4.jpg", name: "Porsche 911 — Hood Detail", tag: "detailing" },
+  { src: "det5.jpg", name: "Porsche 911 — Rear Detail", tag: "detailing" },
+  { src: "det6.jpg", name: "Detail Setup — Interior", tag: "detailing" },
+  { src: "det7.jpg", name: "Detail Setup — Trunk Kit", tag: "detailing" },
+  { src: "det8.jpg", name: "Detail Supplies — Chemical Kit", tag: "detailing" },
+  { src: "det9.jpg", name: "Detail Supplies — Product Inventory", tag: "detailing" },
+  { src: "det10.jpg", name: "Detail Kit — Equipment", tag: "detailing" },
+  { src: "det11.jpg", name: "Tesla Model X — Front Detail", tag: "detailing" },
+  { src: "det12.jpg", name: "Tesla Model X — Side Detail", tag: "detailing" },
+  { src: "det13.jpg", name: "Porsche 911 — Rear View", tag: "detailing" },
+  { src: "det14.jpg", name: "Detail Supplies — Spray Bottles", tag: "detailing" },
+];
+
+let activeTag = 'all';
+const gallery = document.getElementById('gallery');
+const heroCount = document.getElementById('hero-count');
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lb-img');
+const lbTitle = document.getElementById('lb-title');
+const lbTag = document.getElementById('lb-tag');
+const tagLabel = t => ({ sneakers: 'Sneakers', detailing: 'Detailing', all: 'All' }[t] || t);
+
+function updateCounts() {
+  heroCount.textContent = photos.length;
+  document.getElementById('tc-all').textContent = photos.length;
+  document.getElementById('tc-sneakers').textContent = photos.filter(p => p.tag === 'sneakers').length;
+  document.getElementById('tc-detailing').textContent = photos.filter(p => p.tag === 'detailing').length;
+}
+
+function render() {
+  const filtered = activeTag === 'all' ? photos : photos.filter(p => p.tag === activeTag);
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-tag="${activeTag}"]`).classList.add('active');
+  if (!filtered.length) { gallery.innerHTML = '<div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><p>No photos yet</p></div>'; return; }
+  gallery.innerHTML = filtered.map((p, i) => `<div class="card" data-index="${i}"><div class="card-img-wrap"><img src="${p.src}" alt="${p.name}" loading="lazy"></div><div class="card-body"><div class="card-name">${p.name}</div><span class="tag-pill">${tagLabel(p.tag)}</span></div></div>`).join('');
+  gallery.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      const p = filtered[parseInt(card.dataset.index)];
+      lbImg.src = p.src; lbImg.alt = p.name;
+      lbTitle.textContent = p.name; lbTag.textContent = tagLabel(p.tag);
+      lightbox.classList.add('open');
+    });
+  });
+}
+
+document.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', () => { activeTag = tab.dataset.tag; render(); }); });
+document.getElementById('lb-close').addEventListener('click', () => lightbox.classList.remove('open'));
+lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
+updateCounts(); render();
+</script>
+</body>
+</html>
